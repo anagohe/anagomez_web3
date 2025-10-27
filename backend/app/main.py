@@ -116,3 +116,4 @@ def procesar_lote(operaciones: List[OperacionBatch] = Body(...)):
 def borrar_historial():
     historial_collection.delete_many({})
     return {"mensaje": "Historial borrado"}
+
