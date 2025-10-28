@@ -2,7 +2,13 @@ global:
   scrape_interval: 5s  # cada 5 segundos
 
 scrape_configs:
+  # Job para monitorear al propio Prometheus
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Job para monitorear tu API de FastAPI
   - job_name: "fastapi-backend"
     static_configs:
-      - targets: ["practicas-calculadora-1:8000"]  # nombre del servicio y puerto dentro del network
-
+      # El target debe ser el "nombre del servicio" de docker-compose
+      - targets: ["backend:8000"]

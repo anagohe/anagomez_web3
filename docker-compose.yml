@@ -1,5 +1,3 @@
-
-
 services:
   # Servicio del Backend (FastAPI)
   backend:
@@ -12,6 +10,8 @@ services:
       - DATABASE_URL=mongodb://db:27017
     depends_on:
       - db
+    networks: # <--- AÑADIDO
+      - app-network
 
   # Servicio de la Base de Datos (MongoDB)
   db:
@@ -20,6 +20,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    networks: # <--- AÑADIDO
+      - app-network
 
   # Servicio del Frontend (React) 
   frontend:
@@ -30,6 +32,45 @@ services:
       - ./frontend/src:/app/src
     depends_on:
       - backend
+    networks: # <--- AÑADIDO
+      - app-network
+
+  # --- SERVICIOS DE MONITORING PEGADOS ---
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      # Ruta corregida para apuntar a la carpeta monitoring/
+      - ./monitoring/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+    ports:
+      - "9090:9090"
+    networks: # <--- CAMBIADO
+      - app-network
+    
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000" # ¡Perfecto que ya cambiaste el puerto!
+    networks: # <--- CAMBIADO
+      - app-network
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      # Cambiado a "named volume" para ser consistente
+      - grafana-data:/var/lib/grafana
 
 volumes:
   mongo-data:
+  grafana-data: # <--- AÑADIDO
+
+# --- RED ÚNICA PARA TODOS LOS SERVICIOS ---
+networks:
+  app-network:
+    driver: bridge
