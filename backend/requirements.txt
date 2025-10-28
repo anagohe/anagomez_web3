@@ -4,4 +4,4 @@ pymongo
 pydantic
 pytest
 httpx 
-prometheus-fastapi-instrumentator
+prometheus_fastapi_instrumentator

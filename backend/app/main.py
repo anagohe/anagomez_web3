@@ -119,3 +119,4 @@ def borrar_historial():
     historial_collection.delete_many({})
     return {"mensaje": "Historial borrado"}
 
+Instrumentator().instrument(app).expose(app)
