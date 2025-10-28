@@ -9,13 +9,15 @@ import operator
 from functools import reduce
 
 from app.models import Operacion, OperacionBatch, OperacionDB
-
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI(
     title="API de Calculadora",
     description="Una API para realizar operaciones matemáticas y guardar un historial.",
     version="1.0.0"
 )
+
+Instrumentator().instrument(app).expose(app)
 
 origins = ["http://localhost", "http://localhost:3000", "http://127.0.0.1:3000"]
 app.add_middleware(
