@@ -66,9 +66,38 @@ services:
       # Cambiado a "named volume" para ser consistente
       - grafana-data:/var/lib/grafana
 
+  # --- AÑADIR SERVICIOS DE LOGS ---
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100" 
+    volumes:
+      - loki-data:/loki
+      - ./monitoring/loki-config.yaml:/etc/loki/config.yaml
+    networks:
+      - app-network
+    command: -config.file=/etc/loki/config.yaml
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      # Monta el archivo de config que acabamos de crear
+      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
+      # Monta el Docker Socket para que pueda leer los logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - app-network
+    depends_on:
+      - loki
+
 volumes:
   mongo-data:
-  grafana-data: # <--- AÑADIDO
+  grafana-data:
+  loki-data:
 
 # --- RED ÚNICA PARA TODOS LOS SERVICIOS ---
 networks:
